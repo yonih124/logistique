@@ -1,0 +1,385 @@
+# API LOGISTIQUE
+
+URL de base : http://localhost:3000/api
+
+# INSTALLATION
+
+npm install
+npx prisma migrate dev
+npx prisma generate
+npm run dev
+
+# AUTHENTIFICATION
+
+Après la connexion, le JWT est envoyé dans le cookie HTTP-only `access_token`.
+Il est aussi possible de transmettre le token dans le header :
+
+Authorization: Bearer VOTRE_TOKEN
+
+## Connexion
+
+POST : http://localhost:3000/api/auth/login
+Accès : public
+
+{
+    "id_utilisateur_im": 2398,
+    "mot_de_passe": "motdepasse123"
+}
+
+## Utilisateur connecté
+
+GET : http://localhost:3000/api/auth/me
+Accès : utilisateur authentifié
+
+## Déconnexion
+
+POST : http://localhost:3000/api/auth/logout
+Accès : utilisateur authentifié
+
+# FORMAT CRUD COMMUN
+
+Pour chaque ressource CRUD :
+
+GET    /api/ressource       : récupérer toute la liste
+GET    /api/ressource/:id   : récupérer un élément
+POST   /api/ressource       : créer un élément
+PATCH  /api/ressource/:id   : modifier un ou plusieurs champs
+DELETE /api/ressource/:id   : supprimer un élément
+
+# UTILISATEURS
+
+Accès : VALIDATEUR
+
+GET    : http://localhost:3000/api/utilisateurs
+GET    : http://localhost:3000/api/utilisateurs/:id
+POST   : http://localhost:3000/api/utilisateurs
+PATCH  : http://localhost:3000/api/utilisateurs/:id
+DELETE : http://localhost:3000/api/utilisateurs/:id
+
+Corps POST :
+
+{
+    "id_utilisateur_im": 2398,
+    "role": "DEPOSITAIRE",
+    "nom_complet": "Razafitsotra",
+    "mail": "razafitsotra@gmail.com",
+    "service": "Logistique",
+    "mot_de_passe": "motdepasse123",
+    "status_utilisateur": "actif"
+}
+
+Valeurs de `role` : VALIDATEUR, DEPOSITAIRE, CLIENT.
+Valeurs de `status_utilisateur` : actif, inactif.
+Le mot de passe doit contenir au moins 8 caractères.
+
+Corps PATCH, exemple :
+
+{
+    "nom_complet": "Nouveau nom",
+    "status_utilisateur": "inactif"
+}
+
+# CATALOGUES
+
+Accès : DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/catalogues
+GET    : http://localhost:3000/api/catalogues/:id
+POST   : http://localhost:3000/api/catalogues
+PATCH  : http://localhost:3000/api/catalogues/:id
+DELETE : http://localhost:3000/api/catalogues/:id
+
+Corps POST :
+
+{
+    "designation": "Papier A4",
+    "emplacement": "Magasin A",
+    "stock_min": 10,
+    "id_compte": 1,
+    "id_unite": 1
+}
+
+# STOCKS
+
+Accès : DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/stocks
+GET    : http://localhost:3000/api/stocks/:id
+POST   : http://localhost:3000/api/stocks
+PATCH  : http://localhost:3000/api/stocks/:id
+DELETE : http://localhost:3000/api/stocks/:id
+
+Corps POST :
+
+{
+    "quantite_stock": 100,
+    "id_catalogue": 1
+}
+
+# LISTES D'ENTRÉE
+
+Accès : DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/listes-entree
+GET    : http://localhost:3000/api/listes-entree/:id
+POST   : http://localhost:3000/api/listes-entree
+PATCH  : http://localhost:3000/api/listes-entree/:id
+DELETE : http://localhost:3000/api/listes-entree/:id
+
+Corps POST :
+
+{
+    "id_catalogue": 1,
+    "id_justification_entre": 1,
+    "quantite": 50
+}
+
+Pour ajouter plusieurs produits dans la même justification d'entrée :
+
+POST : http://localhost:3000/api/listes-entree/multiple
+
+Dans Postman, choisir Body > raw > JSON puis envoyer :
+
+{
+    "id_justification_entre": 1,
+    "produits": [
+        {
+            "id_catalogue": 1,
+            "quantite": 50
+        },
+        {
+            "id_catalogue": 2,
+            "quantite": 25
+        },
+        {
+            "id_catalogue": 3,
+            "quantite": 10
+        }
+    ]
+}
+
+La requête accepte de 1 à 100 produits. Tous les catalogues et la justification doivent déjà exister.
+
+À chaque ajout simple ou multiple dans `listes-entree`, le stock est mis à jour automatiquement :
+
+- si un stock existe pour le catalogue, la quantité est ajoutée à `quantite_stock` ;
+- si aucun stock n'existe, une ligne de stock est créée avec la quantité reçue ;
+- l'entrée et le stock sont enregistrés dans une même transaction.
+
+# JUSTIFICATIONS D'ENTRÉE
+
+Accès : DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/justifications-entree
+GET    : http://localhost:3000/api/justifications-entree/:id
+POST   : http://localhost:3000/api/justifications-entree
+PATCH  : http://localhost:3000/api/justifications-entree/:id
+DELETE : http://localhost:3000/api/justifications-entree/:id
+
+Corps POST :
+
+{
+    "id_justification_entre": 1,
+    "date_piece": "2026-09-01T10:00:00.000Z",
+    "marche_concerne": "Marché 2026-01",
+    "fournisseur": "Fournisseur SA",
+    "id_utilisateur_im": 2398
+}
+
+`date_piece` est optionnel. La date actuelle est utilisée par défaut.
+
+# COMPTES
+
+Accès : DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/comptes
+GET    : http://localhost:3000/api/comptes/:id
+POST   : http://localhost:3000/api/comptes
+PATCH  : http://localhost:3000/api/comptes/:id
+DELETE : http://localhost:3000/api/comptes/:id
+
+Corps POST :
+
+{
+    "id_compte": 1,
+    "categorie": "Fournitures",
+    "description": "Fournitures administratives"
+}
+
+# UNITÉS
+
+Accès : DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/unites
+GET    : http://localhost:3000/api/unites/:id
+POST   : http://localhost:3000/api/unites
+PATCH  : http://localhost:3000/api/unites/:id
+DELETE : http://localhost:3000/api/unites/:id
+
+Corps POST :
+
+{
+    "unite": "Carton",
+    "description": "Carton de 5 ramettes"
+}
+
+# DEMANDES CLIENT
+
+Accès : CLIENT, VALIDATEUR
+
+GET    : http://localhost:3000/api/demandes
+GET    : http://localhost:3000/api/demandes/:id
+POST   : http://localhost:3000/api/demandes
+PATCH  : http://localhost:3000/api/demandes/:id
+DELETE : http://localhost:3000/api/demandes/:id
+
+Corps POST :
+
+{
+    "date_livraison": "2026-09-10T08:00:00.000Z",
+    "status_demande": "ENVOYER",
+    "Urgence": "URGENT",
+    "id_utilisateur_im": 2398
+}
+
+Valeurs de `status_demande` : ENVOYER, REFUSER, VALIDER.
+`date_demande` est optionnel et utilise la date actuelle par défaut.
+`date_livraison` est optionnel et peut être `null`.
+
+# LISTES DE DEMANDE
+
+Accès : CLIENT, VALIDATEUR
+
+GET    : http://localhost:3000/api/listes-demande
+GET    : http://localhost:3000/api/listes-demande/:id
+POST   : http://localhost:3000/api/listes-demande
+PATCH  : http://localhost:3000/api/listes-demande/:id
+DELETE : http://localhost:3000/api/listes-demande/:id
+
+Corps POST :
+
+{
+    "id_catalogue": 1,
+    "quantite_liste_demande": 5,
+    "motif_demande": 1,
+    "status_liste_demande": "MODIFIER",
+    "id_demande_client": 1
+}
+
+Valeurs de `status_liste_demande` : REJETER, VALIDER, MODIFIER.
+
+Pour ajouter plusieurs produits dans la même demande :
+
+POST : http://localhost:3000/api/listes-demande/multiple
+
+Dans Postman, choisir Body > raw > JSON puis envoyer :
+
+{
+    "id_demande_client": 1,
+    "produits": [
+        {
+            "id_catalogue": 1,
+            "quantite_liste_demande": 5,
+            "motif_demande": 1,
+            "status_liste_demande": "MODIFIER"
+        },
+        {
+            "id_catalogue": 2,
+            "quantite_liste_demande": 10,
+            "motif_demande": 2,
+            "status_liste_demande": "MODIFIER"
+        },
+        {
+            "id_catalogue": 3,
+            "quantite_liste_demande": 2,
+            "motif_demande": 3,
+            "status_liste_demande": "MODIFIER"
+        }
+    ]
+}
+
+La requête accepte de 1 à 100 produits. La demande et tous les catalogues doivent déjà exister.
+
+# CONVERSATIONS
+
+Accès : CLIENT, DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/conversations
+GET    : http://localhost:3000/api/conversations/:id
+POST   : http://localhost:3000/api/conversations
+PATCH  : http://localhost:3000/api/conversations/:id
+DELETE : http://localhost:3000/api/conversations/:id
+
+Corps POST :
+
+{
+    "id_utilisateur_im": 2398,
+    "id_utilisateur_im2": 2400
+}
+
+`date_conversation` est optionnel et utilise la date actuelle par défaut.
+
+# MESSAGES
+
+Accès : CLIENT, DEPOSITAIRE, VALIDATEUR
+
+GET    : http://localhost:3000/api/messages
+GET    : http://localhost:3000/api/messages/:id
+POST   : http://localhost:3000/api/messages
+PATCH  : http://localhost:3000/api/messages/:id
+DELETE : http://localhost:3000/api/messages/:id
+
+Corps POST :
+
+{
+    "id_conversation": 1,
+    "id_utilisateur_im": 2398,
+    "contenu": "Bonjour, votre demande est en cours de traitement.",
+    "status_message": "ENVOYE"
+}
+
+`date_message` est optionnel et utilise la date actuelle par défaut.
+
+# HISTORIQUES
+
+Accès : VALIDATEUR
+
+GET    : http://localhost:3000/api/historiques
+GET    : http://localhost:3000/api/historiques/:id
+POST   : http://localhost:3000/api/historiques
+DELETE : http://localhost:3000/api/historiques/:id
+
+Corps POST :
+
+{}
+
+Le modèle `historique_changement` ne contient que son identifiant automatique.
+Il ne possède donc aucun champ modifiable avec PATCH.
+
+# RÉPONSES DE L'API
+
+Réponse réussie :
+
+{
+    "success": true,
+    "data": {}
+}
+
+Erreur de validation :
+
+{
+    "success": false,
+    "message": "Données invalides",
+    "details": {}
+}
+
+Codes HTTP principaux :
+
+- 200 : requête réussie
+- 201 : ressource créée
+- 400 : données invalides
+- 401 : authentification requise ou token invalide
+- 403 : rôle non autorisé
+- 404 : ressource introuvable
+- 409 : valeur déjà existante
+- 500 : erreur interne

@@ -1,0 +1,20 @@
+.app-icon {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.sidebar .app-icon,
+.top-navigation button.active .app-icon {
+  filter: brightness(0) invert(1);
+}
+
+.stats .app-icon,
+.delivery-icon .app-icon,
+.prediction-symbol .app-icon {
+  width: 28px;
+  height: 28px;
+}

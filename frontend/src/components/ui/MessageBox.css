@@ -1,0 +1,8 @@
+.crud-message-box { width: min(440px, calc(100vw - 32px)); box-sizing: border-box; border: 0; border-radius: 18px; padding: 30px; text-align: center; color: #173b4b; background: #fff; box-shadow: 0 24px 80px #102d4340; }
+.crud-message-box::backdrop { background: #102d4370; }
+.crud-message-symbol { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 50%; font-size: 28px; font-weight: 700; color: #167449; background: #e3f6ec; }
+.crud-message-box.is-error .crud-message-symbol { color: #b42318; background: #fee8e7; }
+.crud-message-box h2 { font-size: 21px; margin: 0 0 12px; }
+.crud-message-box p { font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; white-space: pre-wrap; }
+.crud-message-box button { margin-top: 16px; background: #163e50; color: white; border: 0; border-radius: 8px; padding: 12px 28px; cursor: pointer; }
+.crud-message-box button:focus-visible { outline: 3px solid #1da99e; outline-offset: 3px; }

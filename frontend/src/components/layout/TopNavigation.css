@@ -1,0 +1,9 @@
+.top-navigation{display:flex;gap:8px;align-items:center;padding:10px;margin-bottom:24px;background:#fff;border:1px solid #dce6ea;border-radius:12px;overflow-x:auto}
+.top-navigation button{display:flex;align-items:center;justify-content:center;gap:9px;flex:1;white-space:nowrap;min-height:44px;border:0;border-radius:8px;padding:10px 14px;background:transparent;color:#476271;font-size:12px;font-weight:600;cursor:pointer}
+.top-navigation button:hover{background:#eef7f6}.top-navigation button.active{background:#12394c;color:white}
+.top-navigation button:focus-visible{outline:2px solid #159b92;outline-offset:2px}
+.top-navigation b{min-width:20px;border-radius:12px;padding:3px 6px;background:#b42318;color:white;font-size:10px}
+.main.has-top-navigation .messaging-shell{height:calc(100dvh - 305px);max-height:calc(100dvh - 305px)}
+@media(max-width:950px){.top-navigation{flex-wrap:wrap}.top-navigation button{flex:1 1 40%}.main.has-top-navigation .messaging-shell{height:calc(100dvh - 360px);max-height:none}}
+@media(max-width:620px){.top-navigation{gap:4px;padding:6px}.top-navigation button{font-size:11px;padding:8px}.main.has-top-navigation .messaging-shell{height:auto;max-height:none}}
+@media print{.top-navigation{display:none}}

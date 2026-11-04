@@ -1,0 +1,16 @@
+.profile > .sidebar-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+  color: #fff;
+  cursor: pointer;
+}
+.sidebar-profile-link:focus-visible { outline: 2px solid #6bd7cb; outline-offset: 4px; }
+.sidebar-profile-info { display: flex; flex-direction: column; min-width: 0; }
+.sidebar-profile-info strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-avatar { width: 38px; height: 38px; flex-shrink: 0; border-radius: 11px; background: #26756f; display: grid; place-items: center; overflow: hidden; font-size: 11px; font-weight: 700; }
+.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }

@@ -1,0 +1,5 @@
+# Scripts et configurations exécutés sous Linux : toujours en fin de ligne LF.
+*.sh        text eol=lf
+Caddyfile   text eol=lf
+*.conf      text eol=lf
+Dockerfile  text eol=lf

@@ -1,0 +1,7 @@
+.stock-danger { background: #fff0ef; color: #b42318; border: 1px solid #efaaa5; border-radius: 8px; padding: 9px 12px; cursor: pointer; }
+.stock-danger:hover { background: #fddbd8; }
+.stock-danger:disabled { opacity: .5; cursor: not-allowed; }
+.stock-danger:focus-visible { outline: 2px solid #b42318; outline-offset: 3px; }
+.stock-correction { max-height: 90dvh; overflow-y: auto; }
+.stock-correction-warning { padding: 15px; color: #a1241b; background: #fff0ef; }
+.stock-correction > section { padding: 18px; }

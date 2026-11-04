@@ -1,0 +1,10 @@
+node_modules
+generated
+uploads
+tests
+.agents
+.env
+.env.*
+*.log
+readme
+skills-lock.json

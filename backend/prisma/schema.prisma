@@ -1,0 +1,285 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  VALIDATEUR
+  DEPOSITAIRE
+  CLIENT
+}
+
+enum StatusDemande {
+  ENVOYER
+  REFUSER
+  VALIDER
+  BON_IMPRIME
+}
+
+enum StatusListeDemande{
+  EN_ATTENTE
+  REJETER
+  VALIDER
+  MODIFIER
+}
+
+enum StatusReception {
+  EN_ATTENTE
+  RECU
+  NON_RECU
+}
+
+model service {
+  id_service Int @id @default(autoincrement())
+  nom_service String @unique
+  Utilisateur utilisateur[]
+  Stock_service stock_service[]
+  Division division[]
+}
+
+model utilisateur {
+  id_utilisateur_im   Int @id
+  role    Role
+  nom_complet   String
+  mail    String?
+  id_service Int
+  mot_de_passe    String
+  status_utilisateur    String
+  photo_url String?
+
+  Justification_entre justification_entre[]
+  Demande_client demande_client[]
+  Utilisation_stock_service utilisation_stock_service[]
+  Dispatch dispatch[]
+  Conversations_demarre conversation[] @relation("ConversationAuteur")
+  Conversations_recue conversation[] @relation("ConversationDestinataire")
+  Messages message[]
+  Service service @relation(fields: [id_service], references: [id_service])
+}
+
+model catalogue {
+  pourcentage_demande_max Int @default(100)
+  id_catalogue  Int  @id @default(autoincrement())
+  designation   String
+  emplacement   String?
+  stock_min   Int
+  id_compte   Int
+  id_unite    Int
+
+  Stock stock[]
+  Liste_entre liste_entre[]
+  Liste_demande liste_demande[]
+  Stock_service stock_service[]
+
+  Compte compte @relation(fields: [id_compte], references: [id_compte])
+  Unite unite  @relation(fields: [id_unite], references: [id_unite] )
+}
+
+model stock {
+  Modifications modification_stock[]
+  id_stock    Int @id @default(autoincrement())
+  quantite_stock    Int
+  id_catalogue    Int
+
+  Catalogue catalogue   @relation(fields: [id_catalogue], references: [id_catalogue])
+}
+
+model modification_stock {
+  id_modification_stock Int @id @default(autoincrement())
+  quantite_avant Int
+  quantite_apres Int
+  motif String
+  id_stock Int
+  Stock stock @relation(fields: [id_stock], references: [id_stock], onDelete: Restrict)
+
+  @@index([id_stock])
+}
+
+model liste_entre {
+  id_liste_entre    Int @id @default(autoincrement())
+  id_catalogue    Int
+  id_justification_entre   Int
+  quantite   Int
+
+  Catalogue catalogue   @relation(fields: [id_catalogue], references: [id_catalogue])
+  Justification_entre justification_entre   @relation(fields: [id_justification_entre], references: [id_justification_entre])
+}
+
+model justification_entre {
+  Photos photo_justification[]
+  id_justification_entre Int @id
+  date_piece    DateTime    @default(now())
+  marche_concerne   String
+  fournisseur   String
+  id_utilisateur_im   Int
+
+  Liste_entre   liste_entre[]
+
+  Utilisateur utilisateur   @relation(fields: [id_utilisateur_im], references: [id_utilisateur_im])
+}
+
+model photo_justification {
+  id_photo_justification Int @id @default(autoincrement())
+  url_photo String
+  id_justification_entre Int
+  Justification_entre justification_entre @relation(fields: [id_justification_entre], references: [id_justification_entre], onDelete: Cascade)
+
+  @@index([id_justification_entre])
+}
+
+model compte {
+  id_compte   Int @id
+  categorie   String?
+  description   String?
+
+  Catalogue catalogue[]
+}
+
+model unite {
+  id_unite    Int @id @default(autoincrement())
+  unite   String
+  description String?
+
+  Catalogue catalogue[]
+}
+
+model demande_client {
+  id_demande_client   Int @id @default(autoincrement())
+  date_demande    DateTime @default(now())
+  date_livraison    DateTime?
+  date_traitement DateTime?
+  status_demande    StatusDemande
+  Urgence   String
+  id_utilisateur_im   Int
+
+  Liste_demande liste_demande[]
+
+  Utilisateur utilisateur @relation(fields: [id_utilisateur_im], references: [id_utilisateur_im])
+
+}
+
+model liste_demande {
+  id_liste_demande   Int @id @default(autoincrement())
+  id_catalogue    Int
+  quantite_liste_demande    Int
+  motif_demande   String
+  quantite_accordee Int?
+  pourcentage_accorde Int?
+  status_liste_demande    StatusListeDemande
+  status_reception StatusReception @default(EN_ATTENTE)
+  stock_service_enregistre Boolean @default(false)
+  date_reception DateTime?
+  id_demande_client Int
+
+  Catalogue catalogue   @relation(fields: [id_catalogue], references: [id_catalogue])
+  Demande_client demande_client @relation(fields: [id_demande_client], references: [id_demande_client])
+  Motif_rejet motif_rejet?
+  Utilisation_stock_service utilisation_stock_service[]
+}
+
+model stock_service {
+  id_stock_service Int @id @default(autoincrement())
+  id_service Int
+  id_catalogue Int
+  reparti Int @default(0)
+  restant Int @default(0)
+
+  Service service @relation(fields: [id_service], references: [id_service])
+  Catalogue catalogue @relation(fields: [id_catalogue], references: [id_catalogue])
+  Dispatch dispatch[]
+
+  @@unique([id_service, id_catalogue])
+}
+
+model division {
+  id_division Int @id @default(autoincrement())
+  nom_division String
+  id_service Int
+
+  Service service @relation(fields: [id_service], references: [id_service])
+  Dispatch dispatch[]
+
+  @@unique([id_service, nom_division])
+}
+
+model dispatch {
+  id_dispatch Int @id @default(autoincrement())
+  id_division Int
+  id_stock_service Int
+  nombre Int
+  date_dispatch DateTime @default(now())
+  id_utilisateur_im Int
+
+  Utilisateur utilisateur @relation(fields: [id_utilisateur_im], references: [id_utilisateur_im])
+  Division division @relation(fields: [id_division], references: [id_division])
+  Stock_service stock_service @relation(fields: [id_stock_service], references: [id_stock_service])
+
+  @@index([id_utilisateur_im])
+  @@index([id_stock_service])
+}
+
+model utilisation_stock_service {
+  id_utilisation Int @id @default(autoincrement())
+  quantite Int
+  motif String
+  date_utilisation DateTime @default(now())
+  id_utilisateur_im Int
+  id_liste_demande Int
+
+  Utilisateur utilisateur @relation(fields: [id_utilisateur_im], references: [id_utilisateur_im])
+  Liste_demande liste_demande @relation(fields: [id_liste_demande], references: [id_liste_demande])
+
+  @@index([id_utilisateur_im])
+  @@index([id_liste_demande])
+}
+
+model motif_rejet {
+  id_motif_rejet Int @id @default(autoincrement())
+  motif String
+  date_rejet DateTime @default(now())
+  id_liste_demande Int @unique
+
+  Liste_demande liste_demande @relation(fields: [id_liste_demande], references: [id_liste_demande], onDelete: Cascade)
+}
+
+model historique_changement {
+  id_model_historique_changement    Int @id @default(autoincrement())
+}
+
+model conversation {
+  id_conversation   Int @id @default(autoincrement())
+  id_utilisateur_im   Int
+  id_utilisateur_im2    Int
+  date_conversation   DateTime @default(now())
+
+  Utilisateur utilisateur @relation("ConversationAuteur", fields: [id_utilisateur_im], references: [id_utilisateur_im])
+  Utilisateur2 utilisateur @relation("ConversationDestinataire", fields: [id_utilisateur_im2], references: [id_utilisateur_im])
+  Message message[]
+
+  @@index([id_utilisateur_im])
+  @@index([id_utilisateur_im2])
+}
+
+model message {
+  id_message  Int @id @default(autoincrement())
+  id_conversation   Int
+  id_utilisateur_im   Int
+  contenu   String
+  status_message    String
+  date_message    DateTime @default(now())
+
+  Conversation conversation @relation(fields: [id_conversation], references: [id_conversation], onDelete: Cascade)
+  Utilisateur utilisateur @relation(fields: [id_utilisateur_im], references: [id_utilisateur_im])
+
+  @@index([id_conversation])
+  @@index([id_utilisateur_im])
+}

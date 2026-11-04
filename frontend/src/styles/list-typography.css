@@ -1,0 +1,36 @@
+/* Screen readability only: preserve the existing printed document layout. */
+@media screen {
+  .main table:not(.bon-sortie table) { font-size: 15px; }
+  .main table:not(.bon-sortie table) th {
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 14px 18px;
+  }
+  .main table:not(.bon-sortie table) td {
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 16px 18px;
+  }
+  .main table:not(.bon-sortie table) td :is(strong, p, input, select, textarea) {
+    font-size: 15px;
+  }
+  .main table:not(.bon-sortie table) :is(small, .article-ref, .status, .operation-type, .reference-code, button, .link) {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .main :is(.delivery-cards, .check-articles, .review-list, .conversation-list) :is(strong, h3) {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .main :is(.delivery-cards, .check-articles, .review-list, .conversation-list) :is(small, p, button, .status) {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .main .delivery-main > span { font-size: 14px; }
+  .notification-center .notification-list :is(strong, span) { font-size: 14px; line-height: 1.5; }
+  .notification-center .notification-list small { font-size: 12px; }
+  .main :is(.catalogue-search input, .account-filter, .history-tools select, .approval-toolbar select, .empty) {
+    font-size: 14px;
+  }
+  .main .table-scroll { overflow-x: auto; }
+}

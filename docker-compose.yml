@@ -1,0 +1,93 @@
+# OptiStock — pile complète : PostgreSQL, API Node, service IA, interface React (Nginx) et Caddy (HTTPS).
+# Démarrage : cp .env.example .env  (puis remplir)  →  docker compose up -d --build
+name: optistock
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-optistock}
+      POSTGRES_USER: ${POSTGRES_USER:-optistock}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant dans .env}
+      AI_DB_USER: ${AI_DB_USER:-optistock_ai}
+      AI_DB_PASSWORD: ${AI_DB_PASSWORD:?AI_DB_PASSWORD manquant dans .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-optistock}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-optistock}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET manquant dans .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      CLIENT_URL: ${PUBLIC_URL:-http://localhost}
+      AI_SERVICE_URL: http://ai:8001
+      AI_SERVICE_TOKEN: ${AI_SERVICE_TOKEN:?AI_SERVICE_TOKEN manquant dans .env}
+      # Caddy → Nginx → API : deux proxys de confiance.
+      TRUST_PROXY: 2
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      COOKIE_SAMESITE: lax
+    volumes:
+      - uploads:/app/uploads
+
+  ai:
+    build: ./ai-service
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Compte PostgreSQL en lecture seule (créé par deploy/postgres/init).
+      DATABASE_URL: postgresql://${AI_DB_USER:-optistock_ai}:${AI_DB_PASSWORD}@db:5432/${POSTGRES_DB:-optistock}
+      AI_SERVICE_TOKEN: ${AI_SERVICE_TOKEN}
+      AI_RETRAIN_DAYS: ${AI_RETRAIN_DAYS:-7}
+    volumes:
+      - ai-models:/app/models
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      # Nom de domaine (ex. optistock.mondomaine.mg) → certificat HTTPS automatique.
+      # « :80 » pour un accès HTTP simple par adresse IP (avec COOKIE_SECURE=false).
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      ACME_EMAIL: ${ACME_EMAIL:-admin@example.com}
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  db-data:
+  uploads:
+  ai-models:
+  caddy-data:
+  caddy-config:
