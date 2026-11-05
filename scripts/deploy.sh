@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 [ -f .env ] || { echo "Fichier .env manquant : cp .env.example .env puis complétez-le."; exit 1; }
-if grep -q "changez-moi" .env; then echo "Le fichier .env contient encore des valeurs « changez-moi »."; exit 1; fi
+if grep -Eq "^[A-Z_]+=changez-moi" .env; then echo "Le fichier .env contient encore des valeurs « changez-moi »."; exit 1; fi
 
 if [ -d .git ]; then git pull --ff-only; fi
 docker compose build --pull
