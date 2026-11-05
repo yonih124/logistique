@@ -144,6 +144,52 @@ Sauvegarde automatique quotidienne (`crontab -e`) :
 
 Copiez régulièrement le dossier `backups/` hors du serveur (Contabo Object Storage, autre machine).
 
+## Accès réservé au VPN WireGuard
+
+L'application n'écoute que sur l'adresse WireGuard du serveur : elle est invisible
+depuis Internet. WireGuard chiffre déjà le trafic, d'où le HTTP simple.
+
+```bash
+WG_IP=$(ip -4 -o addr show wg0 | awk '{print $4}' | cut -d/ -f1); echo "$WG_IP"
+sed -i "s|^BIND_IP=.*|BIND_IP=$WG_IP|; s|^SITE_ADDRESS=.*|SITE_ADDRESS=:80|; s|^PUBLIC_URL=.*|PUBLIC_URL=http://$WG_IP|; s|^COOKIE_SECURE=.*|COOKIE_SECURE=false|" .env
+
+# Docker doit démarrer après WireGuard, sinon il ne peut pas réserver l'adresse au redémarrage.
+systemctl enable wg-quick@wg0
+mkdir -p /etc/systemd/system/docker.service.d
+printf '[Unit]\nAfter=wg-quick@wg0.service\nWants=wg-quick@wg0.service\n' > /etc/systemd/system/docker.service.d/wireguard.conf
+systemctl daemon-reload
+```
+
+Ouvrir ensuite `http://ADRESSE_WIREGUARD` depuis un poste connecté au VPN. Le
+`AllowedIPs` de ce poste doit inclure cette adresse.
+
+Contrôle : `ss -tlnp | grep -E ':(80|443) '` doit afficher l'adresse WireGuard et
+non `0.0.0.0`.
+
+## Variante : utiliser le Nginx du serveur
+
+Si Nginx est installé sur le serveur, il peut remplacer Caddy devant l'application
+(`docker-compose.host-nginx.yml` et `deploy/nginx/optistock.conf`). Le conteneur
+`web` n'écoute alors que sur `127.0.0.1:8080`.
+
+```bash
+echo 'COMPOSE_FILE=docker-compose.yml:docker-compose.host-nginx.yml' >> .env
+WG_IP=$(ip -4 -o addr show wg0 | awk '{print $4}' | cut -d/ -f1)
+sed "s/WG_IP/$WG_IP/" deploy/nginx/optistock.conf | sudo tee /etc/nginx/sites-available/optistock >/dev/null
+sudo ln -sf /etc/nginx/sites-available/optistock /etc/nginx/sites-enabled/optistock
+sudo mv /etc/nginx/sites-enabled/default /root/nginx-default.bak   # ferme le port 80 public
+
+# Nginx doit démarrer après WireGuard pour pouvoir réserver l'adresse.
+sudo mkdir -p /etc/systemd/system/nginx.service.d
+printf '[Unit]
+After=wg-quick@wg0.service
+Wants=wg-quick@wg0.service
+' | sudo tee /etc/systemd/system/nginx.service.d/wireguard.conf
+sudo systemctl daemon-reload
+sudo nginx -t && sudo systemctl restart nginx
+./scripts/deploy.sh
+```
+
 ## Dépannage
 
 - **Connexion impossible / renvoyé à l'écran de connexion** : en HTTP par IP,

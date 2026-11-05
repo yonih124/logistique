@@ -1,0 +1,10 @@
+# Variante : le Nginx installé sur le serveur remplace Caddy devant l'application.
+# Activation dans .env : COMPOSE_FILE=docker-compose.yml:docker-compose.host-nginx.yml
+services:
+  caddy:
+    profiles: ["desactive"]
+
+  web:
+    # Joignable uniquement depuis le serveur lui-même, via son Nginx.
+    ports:
+      - "127.0.0.1:8080:80"

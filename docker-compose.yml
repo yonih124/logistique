@@ -72,9 +72,11 @@ services:
     depends_on:
       - web
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      # BIND_IP limite l'accès à une interface (ex. l'adresse WireGuard du serveur).
+      # Docker contourne ufw : c'est ce réglage qui protège réellement ces ports.
+      - "${BIND_IP:-0.0.0.0}:80:80"
+      - "${BIND_IP:-0.0.0.0}:443:443"
+      - "${BIND_IP:-0.0.0.0}:443:443/udp"
     environment:
       # Nom de domaine (ex. optistock.mondomaine.mg) → certificat HTTPS automatique.
       # « :80 » pour un accès HTTP simple par adresse IP (avec COOKIE_SECURE=false).
