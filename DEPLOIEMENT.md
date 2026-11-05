@@ -190,6 +190,12 @@ sudo nginx -t && sudo systemctl restart nginx
 ./scripts/deploy.sh
 ```
 
+## HTTPS à travers WireGuard
+
+Let's Encrypt ne couvre pas les adresses privées : le certificat est généré sur le
+serveur et doit être installé sur chaque poste (voir `deploy/nginx/optistock-https.conf`).
+`COOKIE_SECURE` passe alors à `true` et `PUBLIC_URL` en `https://`.
+
 ## Dépannage
 
 - **Connexion impossible / renvoyé à l'écran de connexion** : en HTTP par IP,
