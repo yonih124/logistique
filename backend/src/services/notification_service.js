@@ -7,7 +7,7 @@ export const accountNotification = (item, date = null) => ({ id: `compte-${item.
 export const deliveryNotification = item => ({ id: `bon-${item.id_demande_client}`, type: 'bon', date: item.date_traitement, title: `Bon de sortie à imprimer — DEM-${item.id_demande_client}`, text: 'Demande validée, prête à être livrée', target: 'deliveryNotes' });
 
 export const messageNotification = item => ({ id: `message-${item.id_message}`, type: 'message', messageId: item.id_message, conversationId: item.id_conversation, date: item.date_message, title: `Message de ${item.Utilisateur.nom_complet}`, text: item.contenu.slice(0, 120), target: 'messages' });
-export const requestNotification = item => ({ id: `demande-${item.id_demande_client}`, type: 'demande', date: item.date_demande, title: `Nouvelle demande DEM-${item.id_demande_client}`, text: item.Utilisateur?.nom_complet || 'Client', target: 'requests' });
+export const requestNotification = item => ({ id: `demande-${item.id_demande_client}`, type: 'demande', date: item.date_demande, title: `Nouvelle demande DEM-${item.id_demande_client}`, text: item.Utilisateur?.nom_complet || 'Service demandeur', target: 'requests' });
 
 export async function listNotifications(user) {
   const [messages, demandes, comptes, bons] = await Promise.all([

@@ -1,11 +1,25 @@
-.notification-center{position:fixed;right:22px;bottom:20px;z-index:55}
-.notification-bell{position:relative;display:grid;place-items:center;width:48px;height:48px;border:1px solid #d6e3e7;border-radius:50%;background:#fff;color:#12394c;box-shadow:0 3px 16px #12394c26}
-.notification-bell b{position:absolute;right:-5px;top:-6px;border-radius:15px;background:#b42318;color:white;min-width:22px;padding:3px;font-size:11px}
-.notification-dropdown{position:absolute;right:0;bottom:60px;width:min(390px,calc(100vw - 32px));max-height:75dvh;overflow:auto;background:#fff;border:1px solid #d6e3e7;border-radius:12px;box-shadow:0 10px 35px #12394c33;padding:14px}
-.notification-dropdown header,.notification-options{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.notification-dropdown button{cursor:pointer}.notification-options button{font-size:12px;border:1px solid #d6e3e7;border-radius:6px;background:white;padding:6px;color:#12394c}
-.notification-list>button{display:flex;flex-direction:column;gap:5px;text-align:left;width:100%;padding:12px;border:0;border-top:1px solid #e8eef0;background:white;color:#284555}
-.notification-list>button.unread{background:#eaf7f5;border-left:3px solid #159b92}
-.notification-list span{white-space:normal;overflow-wrap:anywhere;font-size:12px}.notification-list small,.notification-hint{font-size:11px;color:#657780}
+.notification-center{position:relative}
+.notification-bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-2);transition:background-color .15s,border-color .15s,color .15s}
+.notification-bell:hover,.notification-bell[aria-expanded="true"]{background:var(--surface-2);color:var(--text-1);border-color:var(--border-strong)}
+.notification-bell b{position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;display:grid;place-items:center;padding:0 5px;border-radius:999px;border:2px solid var(--surface);background:var(--danger);color:#fff;font-size:10px;font-weight:700;line-height:1}
+.notification-dropdown{position:absolute;right:0;top:calc(100% + 10px);z-index:60;width:min(400px,calc(100vw - 24px));max-height:min(70dvh,560px);overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);padding:6px;animation:ui-pop .16s ease-out;transform-origin:top right}
+.notification-dropdown header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 10px 6px}
+.notification-dropdown header strong{font-size:15px;color:var(--text-1)}
+.notification-dropdown header button{width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--text-3);font-size:20px;line-height:1}
+.notification-dropdown header button:hover{background:var(--surface-2);color:var(--text-1)}
+.notification-options{display:flex;gap:8px;padding:4px 10px 10px;border-bottom:1px solid var(--border)}
+.notification-options button{font-size:12px;font-weight:600;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:6px 10px;color:var(--text-2)}
+.notification-options button:hover:not(:disabled){background:var(--surface-2);color:var(--text-1)}
+.notification-dropdown>p{margin:8px 10px;font-size:12px;color:var(--text-3)}
+.notification-dropdown>p[role="alert"]{color:var(--danger)}
+.notification-list{display:flex;flex-direction:column;gap:2px;padding-top:6px}
+.notification-list>p{margin:18px 10px;text-align:center;color:var(--text-3)}
+.notification-list>button{display:flex;flex-direction:column;gap:3px;text-align:left;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:var(--text-2);transition:background-color .15s}
+.notification-list>button:hover{background:var(--surface-2)}
+.notification-list>button.unread{background:var(--brand-soft)}
+.notification-list>button.unread strong:before{content:'';display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--brand);vertical-align:middle}
+.notification-list strong{font-size:13px;color:var(--text-1)}
+.notification-list span{white-space:normal;overflow-wrap:anywhere;font-size:13px}
+.notification-list small{font-size:11px;color:var(--text-3)}
 .notification-announcement{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%)}
 @media print{.notification-center{display:none}}

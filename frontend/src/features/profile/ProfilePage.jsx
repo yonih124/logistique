@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { updatePassword, updateProfile, updateProfilePhoto } from '@/services/authService'
+import { roleLabel } from '@/app/routes'
 
 export function ProfilePage({ user, setUser, notify }) {
   const [profile, setProfile] = useState({ name: user.name, email: user.email || '', service: user.service, avatar: user.avatar || '' })
@@ -61,7 +62,7 @@ export function ProfilePage({ user, setUser, notify }) {
         {profile.avatar ? <img src={profile.avatar} alt="Photo de profil" /> : <span>{initials}</span>}
         <label title="Changer la photo">✎<input type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseImage} /></label>
       </div>
-      <h2>{profile.name}</h2><span>{user.role}</span><p>{profile.service}</p><strong className="profile-im"># {user.im}</strong>
+      <h2>{profile.name}</h2><span>{roleLabel(user.role)}</span><p>{profile.service}</p><strong className="profile-im"># {user.im}</strong>
       <div className="photo-actions"><label>Changer la photo<input type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseImage} /></label><small>{pendingPhoto ? 'Nouvelle photo prête à être enregistrée' : 'JPG, PNG ou WebP • 2 Mo maximum'}</small></div>
     </aside>
     <div className="profile-forms">
@@ -72,7 +73,7 @@ export function ProfilePage({ user, setUser, notify }) {
           <label className="form-field"><span>Nom complet</span><input required value={profile.name} onChange={event => setProfile({ ...profile, name: event.target.value })} /></label>
           <label className="form-field"><span>Adresse e-mail</span><input required type="email" value={profile.email} onChange={event => setProfile({ ...profile, email: event.target.value })} /></label>
           <label className="form-field"><span>Service</span><input required value={profile.service} onChange={event => setProfile({ ...profile, service: event.target.value })} /></label>
-          <label className="form-field"><span>Rôle</span><input disabled value={user.role} /></label>
+          <label className="form-field"><span>Rôle</span><input disabled value={roleLabel(user.role)} /></label>
         </div>
         <footer className="form-actions"><button className="primary" disabled={savingProfile}>{savingProfile ? 'Enregistrement…' : 'Enregistrer les modifications'}</button></footer>
       </form>

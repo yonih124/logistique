@@ -46,7 +46,7 @@ export async function getOperationsHistory(user) {
 
   for (const request of requests) {
     rows.push({
-      id: `DEM-${request.id_demande_client}-CREATION`, type: 'DEMANDE', label: 'Demande client', date: request.date_demande,
+      id: `DEM-${request.id_demande_client}-CREATION`, type: 'DEMANDE', label: 'Demande du service', date: request.date_demande,
       reference: `DEM-${request.id_demande_client}`, actor: request.Utilisateur.nom_complet, service: request.Utilisateur.Service.nom_service,
       status: 'Envoyée', note: `Urgence : ${request.Urgence}`,
       items: request.Liste_demande.map(line => ({ ...decisionDetails(line), article: line.Catalogue.designation, unite: line.Catalogue.Unite?.unite, quantite: line.quantite_liste_demande, resultat: line.motif_demande })),
@@ -72,7 +72,7 @@ export async function getOperationsHistory(user) {
   }
 
   for (const line of receptions) rows.push({
-    id: `REC-${line.id_liste_demande}`, type: 'RECEPTION', label: 'Réception client', date: line.date_reception || line.Demande_client.date_livraison,
+    id: `REC-${line.id_liste_demande}`, type: 'RECEPTION', label: 'Réception par le service', date: line.date_reception || line.Demande_client.date_livraison,
     reference: `DEM-${line.id_demande_client}`, actor: line.Demande_client.Utilisateur.nom_complet, service: line.Demande_client.Utilisateur.Service.nom_service,
     status: line.status_reception === 'RECU' ? 'Reçu' : 'Non reçu', note: line.status_reception === 'RECU' ? 'Ajouté au stock du service' : 'Article déclaré non reçu',
     items: [{ article: line.Catalogue.designation, unite: line.Catalogue.Unite?.unite, quantite: line.quantite_accordee || 0 }],

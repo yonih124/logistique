@@ -20,7 +20,7 @@ export const PAGES = {
     byRole: { [CLIENT]: { title: 'Mes demandes' }, [VALIDATOR]: { title: 'Demandes à valider', subtitle: 'Examinez les demandes et ajustez les quantités accordées' }, [DEPOSITARY]: { title: 'Demandes à valider', subtitle: 'Examinez les demandes et ajustez les quantités accordées' } },
   },
   forms: { path: '/demandes/nouvelle', roles: [CLIENT], title: 'Nouvelle demande', subtitle: 'Créez une demande d’articles pour votre service' },
-  messages: { path: '/messagerie', roles: ALL, title: 'Messagerie', subtitle: 'Échangez au sujet des demandes entre client et validateur' },
+  messages: { path: '/messagerie', roles: ALL, title: 'Messagerie', subtitle: 'Échangez au sujet des demandes entre service demandeur et validateur' },
   catalogue: { path: '/catalogue', roles: MANAGERS, title: 'Catalogue des articles', subtitle: 'Gérez le référentiel et les niveaux de stock' },
   entries: { path: '/entrees', roles: MANAGERS, title: 'Entrées en stock', subtitle: 'Enregistrez les livraisons et leurs justificatifs' },
   entryHistory: { path: '/entrees/historique', roles: MANAGERS, title: 'Historique des entrées en stock', subtitle: 'Consultez les articles reçus et les photos justificatives' },
@@ -38,6 +38,9 @@ export const PAGES = {
   dispatchTracking: { path: '/suivi-dispatch', roles: MANAGERS, title: 'Suivi des dispatchs', subtitle: 'Suivez les répartitions effectuées par les services bénéficiaires' },
   profile: { path: '/profil', roles: ALL, title: 'Mon profil', subtitle: 'Consultez vos informations et sécurisez votre compte' },
 }
+
+/** Libellé affiché d'un rôle (la valeur interne reste inchangée). */
+export const roleLabel = role => (role === CLIENT ? 'Service demandeur' : role)
 
 export const LOGIN_PATH = '/connexion'
 export const HOME_PATH = PAGES.dashboard.path
@@ -61,19 +64,20 @@ export const SIDEBAR = {
     { label: 'Suivi', items: [['history', 'Mon historique']] },
   ],
   [VALIDATOR]: [
-    { label: 'Principal', items: [['dashboard', 'Tableau de bord']] },
+    { label: 'Principal', items: [['dashboard', 'Tableau de bord'], ['requests', 'Demandes à valider'], ['messages', 'Messagerie']] },
+    { label: 'Stock', items: [['entries', 'Entrées en stock'], ['catalogue', 'Catalogue']] },
     { label: 'Administration', items: [['users', 'Comptes utilisateurs']] },
     { label: 'Suivi', items: [['dispatchTracking', 'Suivi des dispatchs'], ['history', 'Historique'], ['entryHistory', 'Historique des entrées'], ['ai', 'Prévisions IA']] },
   ],
   [DEPOSITARY]: [
-    { label: 'Principal', items: [['dashboard', 'Tableau de bord'], ['deliveryNotes', 'Bons de sortie']] },
-    { label: 'Administration', items: [['references', 'Référentiels']] },
+    { label: 'Principal', items: [['dashboard', 'Tableau de bord'], ['requests', 'Demandes à valider'], ['messages', 'Messagerie'], ['deliveryNotes', 'Bons de sortie']] },
+    { label: 'Stock', items: [['entries', 'Entrées en stock'], ['catalogue', 'Catalogue'], ['references', 'Référentiels']] },
     { label: 'Suivi', items: [['dispatchTracking', 'Suivi des dispatchs'], ['history', 'Historique des livraisons'], ['entryHistory', 'Historique des entrées'], ['ai', 'Prévisions IA']] },
   ],
 }
 
-/** Barre d'opérations affichée en haut pour les gestionnaires. */
-export const TOP_NAV = {
-  [VALIDATOR]: [['requests', 'Demandes à valider'], ['messages', 'Messagerie'], ['entries', 'Entrées en stock'], ['catalogue', 'Catalogue']],
-  [DEPOSITARY]: [['requests', 'Demandes à valider'], ['messages', 'Messagerie'], ['entries', 'Entrées en stock'], ['catalogue', 'Catalogue']],
-}
+/** Identifiant de la page correspondant à une URL. */
+export const pageIdFromPath = pathname => Object.keys(PAGES).find(id => PAGES[id].path === pathname)
+
+/** Section du menu qui contient une page, pour le fil d'Ariane. */
+export const sectionOf = (id, role) => SIDEBAR[role]?.find(section => section.items.some(([itemId]) => itemId === id))?.label

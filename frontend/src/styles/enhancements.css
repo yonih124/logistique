@@ -15,11 +15,39 @@
 .page-header h1{position:relative;padding-left:14px}
 .page-header h1:before{content:'';position:absolute;left:0;top:.18em;bottom:.18em;width:4px;border-radius:4px;background:linear-gradient(180deg,var(--teal),var(--series-2))}
 .page-content{min-width:0}
+.header-actions:empty{display:none}
+@media(max-width:720px){.catalogue-tools .catalogue-search,.reference-toolbar .catalogue-search{flex:none}}
 
-/* ---------- Tableaux : lecture plus confortable ---------- */
+/* ---------- Messagerie : liste et messages défilent, la saisie reste visible ---------- */
+.messaging-shell{grid-template-rows:minmax(0,1fr);min-height:480px}
+.conversation-list{min-height:0}
+.conversation-list>header,.conversation-search{flex:none}
+.conversation-items{flex:1 1 auto;min-height:0}
+@media(max-width:620px){
+  .messaging-shell{grid-template-rows:auto;min-height:0}
+}
+
+/* ---------- Tableaux : pas de défilement horizontal ---------- */
+.table-scroll{container-type:inline-size}
 .table-scroll thead th{position:sticky;top:0;z-index:1}
 .table-scroll tbody tr{transition:background-color .15s}
 .table-scroll tbody tr:hover{background:#f4faf9}
+.table-scroll td,.table-scroll th{white-space:normal;overflow-wrap:break-word}
+.table-scroll td .link,.table-scroll td .status{white-space:nowrap}
+
+/* Place insuffisante : chaque ligne devient une carte (libellés posés par useResponsiveTables). */
+@container (max-width:760px){
+  .table-scroll table,.table-scroll tbody,.table-scroll tr,.table-scroll td{display:block;width:100%}
+  .table-scroll thead{display:none}
+  .table-scroll tbody tr{padding:10px 16px;border-bottom:1px solid var(--border)}
+  .main .table-scroll table tbody td{position:relative;min-height:28px;padding:5px 0 5px 42%;border:0}
+  .main .table-scroll table tbody td[data-label]:before{content:attr(data-label);position:absolute;left:0;top:7px;width:38%;font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--text-3)}
+  .main .table-scroll table tbody td[data-label=""]{padding-left:0}
+  .main .table-scroll table tbody td[data-label=""]:before{display:none}
+  .main .table-scroll table tbody td:empty{display:none}
+}
+.table-scroll td.cell-nowrap{white-space:nowrap}
+.table-scroll td.cell-break{overflow-wrap:anywhere}
 
 /* ---------- Boutons ---------- */
 button.primary,.ui-button-link.primary{transition:transform .15s,box-shadow .2s,background-color .2s}

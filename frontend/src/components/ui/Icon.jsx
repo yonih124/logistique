@@ -20,8 +20,14 @@ const icons = {
   requests, logout, catalogue, deliveryNotes, references,
 }
 
+// Icônes dessinées pour les entrées sans image dédiée.
+const svgIcons = {
+  users: <><circle cx="9" cy="8" r="3.2" /><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" /><circle cx="17" cy="9" r="2.4" /><path d="M16 14.2c2.3.2 3.9 1.8 4.5 4.8" /></>,
+  profile: <><circle cx="12" cy="8" r="3.6" /><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6" /></>,
+}
+
 export function Icon({ name, fallback = null }) {
-  return icons[name]
-    ? <img className="app-icon" src={icons[name]} alt="" aria-hidden="true" />
-    : <span aria-hidden="true">{fallback}</span>
+  if (icons[name]) return <img className="app-icon" src={icons[name]} alt="" aria-hidden="true" />
+  if (svgIcons[name]) return <svg className="app-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">{svgIcons[name]}</svg>
+  return <span aria-hidden="true">{fallback}</span>
 }

@@ -49,7 +49,7 @@ export function DashboardPage({ role, user, onNavigate, notify }) {
     <section className="dash-hero">
       <div>
         <span className="dash-date">{date}</span>
-        <h2>{greeting()}{firstName ? `, ${firstName}` : ''} 👋</h2>
+        <h2>{greeting()}{firstName ? `, ${firstName}` : ''}</h2>
         <p>{loading ? 'Chargement de votre activité…' : client ? 'Suivez vos demandes, vos réceptions et le stock de votre service.' : 'Voici l’état du stock et du circuit des demandes, en temps réel.'}</p>
       </div>
       <div className="dash-hero-actions">

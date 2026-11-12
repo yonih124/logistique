@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Chronogramme des activités — OptiStock</title>
+<style>
+  /* Chronogramme dans le style d'un diagramme de Gantt (export pour le mémoire).
+     Modifier les dates dans TASKS ci-dessous, puis régénérer l'image. */
+  :root { --row: 34px; --left: 420px; --head: 74px; --grid: #c9c9c9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; font: 12px Arial, Helvetica, sans-serif; color: #111; }
+  #chart { display: inline-flex; border: 1px solid #9a9a9a; }
+
+  /* ---- Tableau de gauche ---- */
+  .left { width: var(--left); border-right: 2px solid #8c8c8c; }
+  .brand { height: 52px; display: flex; align-items: center; padding-left: 14px;
+    background:
+      radial-gradient(circle at 20% 50%, #ffffff30 0 14px, transparent 15px),
+      linear-gradient(115deg, #6f9a9a, #9fc3c0 45%, #d7e6e4);
+    color: #fff; font: italic 700 22px Georgia, serif; letter-spacing: .5px; text-shadow: 0 1px 2px #0005; }
+  .brand small { font: 400 12px Arial, sans-serif; margin-left: 8px; opacity: .9; font-style: normal; }
+  .cols, .row { display: grid; grid-template-columns: 1fr 82px 78px; }
+  .cols { height: 22px; background: linear-gradient(#fafafa, #e4e4e4); border-top: 1px solid #b5b5b5; border-bottom: 1px solid #a8a8a8; }
+  .cols div { display: grid; place-items: center; border-right: 1px solid #b9b9b9; }
+  .cols div:last-child { border-right: 0; }
+  .row { height: var(--row); align-items: center; border-bottom: 1px solid #fff; }
+  .row:nth-child(odd) { background: #f1f1f1; }
+  .row:nth-child(even) { background: #e6e6e6; }
+  .row div { padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row div + div { text-align: center; padding: 0; }
+
+  /* ---- Diagramme de droite ---- */
+  .right { position: relative; background: #fff; }
+  .year { height: 30px; padding: 6px 6px 0; font-weight: 700; font-size: 14px; background: linear-gradient(#f6f6f6, #e9e9e9); border-bottom: 1px solid #b5b5b5; }
+  .months { position: relative; height: 44px; border-bottom: 1px solid #a8a8a8; background: #fff; }
+  .months span { position: absolute; top: 12px; padding-left: 2px; border-left: 1px solid #555; height: 32px; }
+  .body { position: relative; }
+  .stripe { position: absolute; top: 0; bottom: 0; background: #eaeaea; }
+  .line { position: absolute; left: 0; right: 0; height: 1px; background: var(--grid); }
+  .bar { position: absolute; height: 14px; border: 1px solid #222; box-shadow: inset 0 -3px 0 #0002; }
+  svg { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="chart">
+  <div class="left">
+    <div class="brand">Chronogramme<small>Projet OptiStock</small></div>
+    <div class="cols"><div>Nom</div><div>Date de début</div><div>Date de fin</div></div>
+    <div id="rows"></div>
+  </div>
+  <div class="right" id="right">
+    <div class="year" id="year"></div>
+    <div class="months" id="months"></div>
+    <div class="body" id="body"></div>
+  </div>
+</div>
+<script>
+// Stage commencé le 13 juillet 2026. after = tâche dont la fin déclenche celle-ci (flèche).
+const TASKS = [
+  { name: 'Recueil des besoins', start: '2026-07-13', end: '2026-07-24', color: '#8eaacb' },
+  { name: 'Analyse et critique de l’existant', start: '2026-07-27', end: '2026-07-31', color: '#2f2fe8', after: 0 },
+  { name: 'Conception', start: '2026-08-03', end: '2026-08-21', color: '#9a12f0', after: 1 },
+  { name: 'Mise en place de l’environnement de travail', start: '2026-08-24', end: '2026-08-28', color: '#f06262', after: 2 },
+  { name: 'Développement', start: '2026-08-31', end: '2026-10-16', color: '#c8c800', after: 3 },
+  { name: 'Test', start: '2026-08-31', end: '2026-10-16', color: '#63f063', after: 3 },
+  { name: 'Correction', start: '2026-10-19', end: '2026-10-30', color: '#22c9c9', after: 4 },
+  { name: 'Optimisation et déploiement', start: '2026-11-02', end: '2026-11-06', color: '#f53ff0', after: 6 },
+  { name: 'Rédaction du mémoire', start: '2026-08-31', end: '2026-11-20', color: '#c8f5c8' },
+]
+const FROM = new Date('2026-07-01T00:00:00Z'), TO = new Date('2026-12-01T00:00:00Z')
+const DAY = 3.6, ROW = 34, DAYMS = 86400000
+const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+
+const date = text => new Date(text + 'T00:00:00Z')
+const x = d => Math.round((d - FROM) / DAYMS * DAY)
+const fr = text => text.split('-').reverse().join('/')
+const width = x(TO), height = TASKS.length * ROW
+
+document.getElementById('rows').innerHTML = TASKS.map(task =>
+  `<div class="row"><div>${task.name}</div><div>${fr(task.start)}</div><div>${fr(task.end)}</div></div>`).join('')
+
+const right = document.getElementById('right')
+right.style.width = width + 'px'
+document.getElementById('year').textContent = FROM.getUTCFullYear()
+
+const months = document.getElementById('months')
+for (let d = new Date(FROM); d < TO; d.setUTCMonth(d.getUTCMonth() + 1)) {
+  months.insertAdjacentHTML('beforeend', `<span style="left:${x(d)}px">${MONTHS[d.getUTCMonth()]}</span>`)
+}
+
+const body = document.getElementById('body')
+body.style.height = height + 'px'
+let html = ''
+// Week-ends grisés, comme dans un diagramme de Gantt.
+for (let d = new Date(FROM); d < TO; d = new Date(+d + DAYMS)) {
+  if (d.getUTCDay() === 6) html += `<div class="stripe" style="left:${x(d)}px;width:${2 * DAY}px"></div>`
+}
+for (let i = 1; i <= TASKS.length; i++) html += `<div class="line" style="top:${i * ROW - 1}px"></div>`
+const bars = TASKS.map((task, i) => {
+  const left = x(date(task.start)), right = x(new Date(+date(task.end) + DAYMS))
+  return { left, right, top: i * ROW + 10, mid: i * ROW + 17 }
+})
+TASKS.forEach((task, i) => {
+  const b = bars[i]
+  html += `<div class="bar" style="left:${b.left}px;width:${b.right - b.left}px;top:${b.top}px;background:${task.color}"></div>`
+})
+// Flèches de dépendance : de la fin d'une tâche vers le début de la suivante.
+let arrows = '<defs><marker id="head" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#111"/></marker></defs>'
+TASKS.forEach((task, i) => {
+  if (task.after === undefined) return
+  const from = bars[task.after], to = bars[i]
+  const turn = Math.max(from.right + 6, to.left + 3)
+  arrows += `<path d="M${from.right},${from.mid} H${turn} V${to.top - 1}" fill="none" stroke="#111" stroke-width="1" marker-end="url(#head)"/>`
+})
+body.innerHTML = html + `<svg width="${width}" height="${height}">${arrows}</svg>`
+</script>
+</body>
+</html>
