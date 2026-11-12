@@ -3,7 +3,7 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
 COPY . .
 # Même origine que l'API (Nginx redirige /api, /uploads et /ws vers le backend).
 ARG VITE_API_URL=/api

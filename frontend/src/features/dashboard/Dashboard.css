@@ -156,6 +156,7 @@
 .activity .table-scroll{padding:0 0 6px}
 .dash-objects{max-width:320px;overflow:hidden;text-overflow:ellipsis}
 .dash-objects em{font-style:normal;font-size:12px;color:var(--teal-strong);font-weight:700}
+@container (max-width:760px){.main .table-scroll td.dash-objects{max-width:none}}
 
 /* Actions rapides */
 .quick-actions{padding-bottom:12px}

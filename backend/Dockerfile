@@ -10,7 +10,7 @@ ENV NODE_ENV=production
 
 COPY package.json package-lock.json ./
 # Prisma CLI (devDependency) est conservé : il applique les migrations au démarrage.
-RUN npm ci --include=dev && npm cache clean --force
+RUN --mount=type=cache,target=/root/.npm npm ci --include=dev --prefer-offline --no-audit --no-fund
 
 COPY prisma ./prisma
 COPY prisma.config.ts ./
