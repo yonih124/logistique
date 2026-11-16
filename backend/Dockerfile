@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 # API Node.js (Express + Prisma 7). Node 24 exécute directement le client Prisma généré en TypeScript.
 FROM node:24-slim
 

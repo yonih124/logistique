@@ -72,19 +72,15 @@ export function createStockUsage(user, payload) {
     const stock = await tx.stock_service.findFirst({ where: { id_stock_service: payload.id_stock_service, id_service: user.id_service } })
     if (!stock) throw new AppError('Stock du service introuvable', 404)
     if (payload.quantite > stock.restant) throw new AppError(`Stock interne insuffisant : ${stock.restant} disponible(s)`, 409)
-    const line = await tx.liste_demande.findFirst({
-      where: { id_catalogue: stock.id_catalogue, Demande_client: { Utilisateur: { id_service: user.id_service } } },
-      orderBy: { id_liste_demande: 'desc' },
-    })
-    if (!line) throw new AppError('Ligne de livraison introuvable', 404)
+    // La sortie diminue le « restant » du stock du service auquel elle est rattachée.
     const updated = await tx.stock_service.updateMany({
       where: { id_stock_service: stock.id_stock_service, restant: { gte: payload.quantite } },
       data: { restant: { decrement: payload.quantite } },
     })
     if (updated.count !== 1) throw new AppError('Stock interne insuffisant', 409)
     return tx.utilisation_stock_service.create({
-      data: { quantite: payload.quantite, motif: payload.motif, id_utilisateur_im: user.id_utilisateur_im, id_liste_demande: line.id_liste_demande },
-      include: { Liste_demande: { include: { Catalogue: { include: { Unite: true } } } } },
+      data: { quantite: payload.quantite, motif: payload.motif, id_utilisateur_im: user.id_utilisateur_im, id_stock_service: stock.id_stock_service },
+      include: { Stock_service: { include: stockInclude } },
     })
   }, { isolationLevel: 'Serializable' })
 }
@@ -92,7 +88,7 @@ export function createStockUsage(user, payload) {
 export function listStockUsages(user) {
   return prisma.utilisation_stock_service.findMany({
     where: user.role === 'CLIENT' ? { id_utilisateur_im: user.id_utilisateur_im } : undefined,
-    include: { Utilisateur: { include: { Service: true } }, Liste_demande: { include: { Catalogue: { include: { Unite: true } } } } },
+    include: { Utilisateur: { include: { Service: true } }, Stock_service: { include: stockInclude } },
     orderBy: { date_utilisation: 'desc' },
   })
 }

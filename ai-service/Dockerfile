@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 # Service de prévision (FastAPI + scikit-learn). Un seul worker : l'ordonnanceur est local au processus.
 FROM python:3.12-slim
 

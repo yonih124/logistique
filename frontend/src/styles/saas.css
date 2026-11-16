@@ -345,3 +345,12 @@ button { font-family: inherit; }
 .main .review-values { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); align-items: end; gap: 12px; }
 .main .review-values label { min-width: 0; white-space: nowrap; }
 .main .review-values input { width: 100%; }
+
+/* Tableaux : défilement interne, en-tête toujours visible.
+   Désactivé à l'impression et en mode « cartes » (petits écrans, où l'en-tête est masqué). */
+@media screen and (min-width: 761px) {
+  .main .table-scroll { max-height: calc(100dvh - var(--topbar-h) - 150px); min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  .main .table-scroll table:not(.bon-sortie) thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-2); box-shadow: 0 1px 0 var(--border); }
+  .main .table-scroll > .empty { position: sticky; left: 0; }
+}
+@media print { .main .table-scroll { max-height: none !important; overflow: visible !important; } }

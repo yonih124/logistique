@@ -183,7 +183,6 @@ model liste_demande {
   Catalogue catalogue   @relation(fields: [id_catalogue], references: [id_catalogue])
   Demande_client demande_client @relation(fields: [id_demande_client], references: [id_demande_client])
   Motif_rejet motif_rejet?
-  Utilisation_stock_service utilisation_stock_service[]
 }
 
 model stock_service {
@@ -196,6 +195,7 @@ model stock_service {
   Service service @relation(fields: [id_service], references: [id_service])
   Catalogue catalogue @relation(fields: [id_catalogue], references: [id_catalogue])
   Dispatch dispatch[]
+  Utilisation_stock_service utilisation_stock_service[]
 
   @@unique([id_service, id_catalogue])
 }
@@ -233,13 +233,13 @@ model utilisation_stock_service {
   motif String
   date_utilisation DateTime @default(now())
   id_utilisateur_im Int
-  id_liste_demande Int
+  id_stock_service Int
 
   Utilisateur utilisateur @relation(fields: [id_utilisateur_im], references: [id_utilisateur_im])
-  Liste_demande liste_demande @relation(fields: [id_liste_demande], references: [id_liste_demande])
+  Stock_service stock_service @relation(fields: [id_stock_service], references: [id_stock_service])
 
   @@index([id_utilisateur_im])
-  @@index([id_liste_demande])
+  @@index([id_stock_service])
 }
 
 model motif_rejet {

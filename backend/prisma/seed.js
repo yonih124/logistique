@@ -294,7 +294,7 @@ async function main() {
       const date_utilisation = addDays(date, 2, 12)
       if (date_utilisation <= now) {
         const quantite = between(1, Math.max(1, Math.floor(row.restant / 2)))
-        utilisations.push({ id_utilisation: utilisations.length + 1, quantite, motif: pick(MOTIFS_UTILISATION), date_utilisation, id_utilisateur_im: client.id_utilisateur_im, id_liste_demande: line.id_liste_demande })
+        utilisations.push({ id_utilisation: utilisations.length + 1, quantite, motif: pick(MOTIFS_UTILISATION), date_utilisation, id_utilisateur_im: client.id_utilisateur_im, id_stock_service: row.id_stock_service })
         row.restant -= quantite
       }
     }

@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 # 1) Build de l'application React avec Vite
 FROM node:24-alpine AS build
 WORKDIR /app

@@ -31,7 +31,7 @@ export async function getOperationsHistory(user) {
     }) : Promise.resolve([]),
     prisma.utilisation_stock_service.findMany({
       where: client ? { id_utilisateur_im: user.id_utilisateur_im } : undefined,
-      include: { Utilisateur: { include: { Service: true } }, Liste_demande: { include: { Catalogue: { include: { Unite: true } } } } },
+      include: { Utilisateur: { include: { Service: true } }, Stock_service: { include: { Catalogue: { include: { Unite: true } } } } },
     }),
   ])
 
@@ -89,7 +89,7 @@ export async function getOperationsHistory(user) {
     id: `UTI-${usage.id_utilisation}`, type: 'SORTIE_SERVICE', label: 'Sortie du stock service', date: usage.date_utilisation,
     reference: `UTI-${usage.id_utilisation}`, actor: usage.Utilisateur.nom_complet, service: usage.Utilisateur.Service.nom_service,
     status: 'Déduite', note: usage.motif,
-    items: [{ article: usage.Liste_demande.Catalogue.designation, unite: usage.Liste_demande.Catalogue.Unite?.unite, quantite: usage.quantite }],
+    items: [{ article: usage.Stock_service.Catalogue.designation, unite: usage.Stock_service.Catalogue.Unite?.unite, quantite: usage.quantite }],
   })
 
   return sortNewest(rows)
