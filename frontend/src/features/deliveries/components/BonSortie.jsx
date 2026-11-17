@@ -7,7 +7,7 @@ export function BonSortie({ request, showShelf, deliveryDate }) {
     unit: line.Catalogue.Unite?.unite || '—',
     quantity: line.quantite_accordee ?? line.quantite_liste_demande,
     shelf: line.Catalogue.emplacement || '—',
-    observation: line.status_liste_demande === 'MODIFIER' ? 'Quantité ajustée' : 'Conforme',
+    observation: '', // colonne laissée vide, à remplir à la main si besoin
   }))
   const service = request.Utilisateur.service
   const requestReference = `DEM-${request.id_demande_client}`

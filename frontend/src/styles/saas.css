@@ -354,3 +354,8 @@ button { font-family: inherit; }
   .main .table-scroll > .empty { position: sticky; left: 0; }
 }
 @media print { .main .table-scroll { max-height: none !important; overflow: visible !important; } }
+
+/* Bon de sortie : logo DGBF centré au-dessus du bloc « MINISTÈRE… », détaché du texte.
+   L'image occupe la même largeur que le bloc (330px) : object-fit la centre dessus. */
+.bon-sortie .bs-emblems { height: 140px; }
+.bon-sortie .dgbf-logo { left: 0; bottom: 12px; width: 330px; height: 62px; object-fit: contain; object-position: center; }
